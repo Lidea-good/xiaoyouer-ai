@@ -346,7 +346,6 @@
             border-color: #f85149;
         }
 
-        /* 输入交互区域 */
         .input-interaction {
             margin-top: 12px;
             padding: 12px;
@@ -567,6 +566,19 @@
             pointer-events: none;
             opacity: 0;
         }
+        .sk-loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 20000;
+            display: none;
+        }
         @media (max-width: 1100px) {
             .dashboard { grid-template-columns: 1fr; gap: 16px; }
             .left-gutter, .right-gutter { display: none; }
@@ -601,7 +613,6 @@
     <div class="dashboard">
         <div class="left-gutter"></div>
 
-        <!-- 模块1：需求输入 -->
         <div class="card card-1">
             <div class="card-header">
                 <div class="card-header-left"><span class="icon">📝</span><span>① 功能需求描述</span></div>
@@ -613,7 +624,6 @@
             </div>
         </div>
 
-        <!-- 模块2：代码编写区 -->
         <div class="card card-2">
             <div class="card-header">
                 <div class="card-header-left"><span class="icon">💻</span><span>② 代码编写区</span></div>
@@ -630,7 +640,6 @@
                     <button id="runCodeBtn" class="run-btn">▶ 运行代码</button>
                     <button id="copyCodeBtn">📋 复制代码</button>
                 </div>
-                <!-- 输入交互区域（用于 input() 函数） -->
                 <div id="inputInteraction" class="input-interaction">
                     <label>📥 程序需要输入：</label>
                     <div class="input-field">
@@ -642,7 +651,6 @@
             </div>
         </div>
 
-        <!-- 模块3：调试工具箱 -->
         <div class="card card-3">
             <div class="card-header">
                 <div class="card-header-left"><span class="icon">🛠️</span><span>③ 调试工具箱</span></div>
@@ -683,7 +691,6 @@
     </div>
 </div>
 
-<!-- 浮动小人儿 -->
 <div id="floatingMascot" class="floating-mascot" style="left: 30px; bottom: 30px;">
     <div class="mascot">
         <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -722,16 +729,70 @@
 
 <div id="tipBubble" class="tip-bubble">🐳 需要帮助吗？</div>
 <div id="fontSizeTip" class="font-size-tip">字体大小: 13px</div>
+<div id="skLoading" class="sk-loading">⏳ 加载 Python 环境中...</div>
 
 <script>
     // ========== API 配置 ==========
-    const API_KEY = 'sk-a59280445c6040a69354cba383ed0581';
+    const API_KEY = 'sk-你的真实API密钥';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+    // ========== Skulpt 加载状态 ==========
+    let skLoaded = false;
+    let skLoadPromise = null;
+
+    function loadSkulpt() {
+        if (skLoaded) return Promise.resolve();
+        if (skLoadPromise) return skLoadPromise;
+        
+        const loadingDiv = document.getElementById('skLoading');
+        loadingDiv.style.display = 'block';
+        
+        skLoadPromise = new Promise((resolve, reject) => {
+            // 加载 Skulpt 主库
+            const skScript = document.createElement('script');
+            skScript.src = 'https://skulpt.org/js/skulpt.min.js';
+            skScript.onload = () => {
+                // 加载 Skulpt 标准库
+                const stdlibScript = document.createElement('script');
+                stdlibScript.src = 'https://skulpt.org/js/skulpt-stdlib.js';
+                stdlibScript.onload = () => {
+                    // 等待 Sk 对象可用
+                    let checkCount = 0;
+                    const checkSk = setInterval(() => {
+                        checkCount++;
+                        if (typeof Sk !== 'undefined') {
+                            clearInterval(checkSk);
+                            skLoaded = true;
+                            loadingDiv.style.display = 'none';
+                            console.log('Skulpt 加载成功');
+                            resolve();
+                        } else if (checkCount > 100) {
+                            clearInterval(checkSk);
+                            loadingDiv.style.display = 'none';
+                            reject(new Error('Skulpt 加载超时'));
+                        }
+                    }, 100);
+                };
+                stdlibScript.onerror = () => {
+                    loadingDiv.style.display = 'none';
+                    reject(new Error('Skulpt 标准库加载失败'));
+                };
+                document.head.appendChild(stdlibScript);
+            };
+            skScript.onerror = () => {
+                loadingDiv.style.display = 'none';
+                reject(new Error('Skulpt 主库加载失败'));
+            };
+            document.head.appendChild(skScript);
+        });
+        
+        return skLoadPromise;
+    }
 
     // ========== 初始化 CodeMirror ==========
     const editorTextarea = document.getElementById('codeEditor');
     const defaultCode = `name = input("请输入您的名字: ")
-print(f"你好, {name}！")`;
+print(f"你好, {name}!")`;
 
     const editor = CodeMirror.fromTextArea(editorTextarea, {
         mode: 'python',
@@ -866,9 +927,7 @@ print(f"你好, {name}！")`;
 
     // ========== 支持 input() 的 Python 执行器 ==========
     let pendingInputResolver = null;
-    let currentCode = '';
     let currentOutput = '';
-    let currentError = null;
 
     function setupInputHandler() {
         Sk.configure({
@@ -908,9 +967,16 @@ print(f"你好, {name}！")`;
     }
 
     async function runPythonCode(code) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            // 确保 Skulpt 已加载
+            try {
+                await loadSkulpt();
+            } catch (err) {
+                reject(new Error('Skulpt 加载失败: ' + err.message));
+                return;
+            }
+            
             currentOutput = '';
-            currentError = null;
             setupInputHandler();
             
             Sk.misceval.asyncToPromise(function() {
@@ -951,7 +1017,7 @@ print(f"你好, {name}！")`;
         setTimeout(() => btn.innerHTML = orig, 2000);
     };
 
-    // ========== 智能问答助手拖拽逻辑 ==========
+    // ========== 智能问答助手拖拽逻辑（简化版，保持原有功能） ==========
     const mascot = document.getElementById('floatingMascot');
     const chatWindow = document.getElementById('floatingChat');
     const tipBubbleEl = document.getElementById('tipBubble');
