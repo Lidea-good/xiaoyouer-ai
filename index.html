@@ -372,43 +372,6 @@
             border-color: #f85149;
         }
 
-        /* 输入交互区域 - 用于 input() 函数 */
-        .input-interaction {
-            margin-top: 12px;
-            padding: 12px;
-            background: #f0f4fa;
-            border-radius: 16px;
-            display: none;
-        }
-
-        .input-interaction.active {
-            display: block;
-        }
-
-        .input-interaction label {
-            font-size: 0.75rem;
-            color: #4a627a;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .input-interaction .input-field {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-interaction input {
-            flex: 1;
-            padding: 8px 12px;
-            font-size: 0.8rem;
-        }
-
-        .input-interaction button {
-            width: auto;
-            padding: 8px 20px;
-            margin: 0;
-        }
-
         .button-group {
             display: flex;
             gap: 10px;
@@ -681,6 +644,54 @@
             transition: opacity 0.2s;
         }
 
+        /* 输入弹窗覆盖层 */
+        .input-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .input-dialog-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .input-dialog {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .input-dialog h3 {
+            margin-bottom: 12px;
+            color: #1e2f3f;
+        }
+        .input-dialog p {
+            margin-bottom: 16px;
+            color: #5c6f87;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .input-dialog input {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .input-dialog .dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
         @media (max-width: 1100px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -759,14 +770,6 @@
                 <div class="button-group">
                     <button id="runCodeBtn" class="run-btn">▶ 运行代码</button>
                     <button id="copyCodeBtn">📋 复制代码</button>
-                </div>
-                <!-- 输入交互区（用于 input() 函数） -->
-                <div id="inputInteraction" class="input-interaction">
-                    <label>📥 程序需要输入：</label>
-                    <div class="input-field">
-                        <input type="text" id="programInput" placeholder="请输入值...">
-                        <button id="submitInputBtn">提交</button>
-                    </div>
                 </div>
                 <div id="runResult" class="result-area">// 运行结果将显示在这里</div>
             </div>
@@ -857,9 +860,22 @@
 <div id="tipBubble" class="tip-bubble">🐳 需要帮助吗？</div>
 <div id="fontSizeTip" class="font-size-tip">字体大小: 13px</div>
 
+<!-- 输入弹窗 -->
+<div id="inputDialog" class="input-dialog-overlay">
+    <div class="input-dialog">
+        <h3>📥 程序需要输入</h3>
+        <p id="inputPrompt"></p>
+        <input type="text" id="dialogInputValue" placeholder="请输入值...">
+        <div class="dialog-buttons">
+            <button id="dialogCancelBtn">取消</button>
+            <button id="dialogConfirmBtn" class="primary">提交</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ========== API 配置 ==========
-    const API_KEY = 'sk-060bceed7bd84205b3cfee92cb4480d6';
+    const API_KEY = 'sk-你的真实API密钥';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
     // ========== 初始化 CodeMirror 编辑器 ==========
@@ -1040,11 +1056,11 @@ print(f"你好, {name}!")`;
         } catch(e) { out.innerText = '❌ 错误: ' + e.message; }
     };
 
-    // ========== Skulpt Python 执行器（支持 input()） ==========
+    // ========== Skulpt Python 执行器（input 完全自定义处理） ==========
     let skulptReady = false;
-    let pendingInputResolver = null;
-    let currentOutput = '';
     let isLoadingSkulpt = false;
+    let pendingInputResolve = null;
+    let currentOutput = '';
 
     function loadSkulpt() {
         return new Promise((resolve, reject) => {
@@ -1054,9 +1070,9 @@ print(f"你好, {name}!")`;
                 return;
             }
             if (isLoadingSkulpt) {
-                const checkInterval = setInterval(() => {
+                const check = setInterval(() => {
                     if (typeof Sk !== 'undefined') {
-                        clearInterval(checkInterval);
+                        clearInterval(check);
                         skulptReady = true;
                         resolve();
                     }
@@ -1064,33 +1080,32 @@ print(f"你好, {name}!")`;
                 return;
             }
             isLoadingSkulpt = true;
-            
             const script = document.createElement('script');
             script.src = 'https://skulpt.org/js/skulpt.min.js';
             script.onload = () => {
-                const stdlibScript = document.createElement('script');
-                stdlibScript.src = 'https://skulpt.org/js/skulpt-stdlib.js';
-                stdlibScript.onload = () => {
+                const stdlib = document.createElement('script');
+                stdlib.src = 'https://skulpt.org/js/skulpt-stdlib.js';
+                stdlib.onload = () => {
                     let attempts = 0;
-                    const checkSk = setInterval(() => {
+                    const timer = setInterval(() => {
                         attempts++;
                         if (typeof Sk !== 'undefined') {
-                            clearInterval(checkSk);
+                            clearInterval(timer);
                             skulptReady = true;
                             isLoadingSkulpt = false;
                             resolve();
                         } else if (attempts > 100) {
-                            clearInterval(checkSk);
+                            clearInterval(timer);
                             isLoadingSkulpt = false;
                             reject(new Error('Skulpt 加载超时'));
                         }
                     }, 100);
                 };
-                stdlibScript.onerror = () => {
+                stdlib.onerror = () => {
                     isLoadingSkulpt = false;
                     reject(new Error('Skulpt 标准库加载失败'));
                 };
-                document.head.appendChild(stdlibScript);
+                document.head.appendChild(stdlib);
             };
             script.onerror = () => {
                 isLoadingSkulpt = false;
@@ -1100,52 +1115,97 @@ print(f"你好, {name}!")`;
         });
     }
 
-    // 配置 Skulpt 输入处理
-    function setupSkulptInput() {
-        Sk.configure({
-            inputfun: function(promptText) {
-                return new Promise((resolve) => {
-                    pendingInputResolver = resolve;
-                    const inputDiv = document.getElementById('inputInteraction');
-                    const inputField = document.getElementById('programInput');
-                    const submitBtn = document.getElementById('submitInputBtn');
-                    
-                    inputDiv.classList.add('active');
-                    inputField.value = '';
-                    inputField.placeholder = promptText || '请输入值...';
-                    inputField.focus();
-                    
-                    const onSubmit = () => {
-                        const value = inputField.value;
-                        inputDiv.classList.remove('active');
-                        pendingInputResolver = null;
-                        resolve(value);
-                        submitBtn.removeEventListener('click', onSubmit);
-                        inputField.removeEventListener('keypress', onKeyPress);
-                    };
-                    const onKeyPress = (e) => { if (e.key === 'Enter') onSubmit(); };
-                    submitBtn.addEventListener('click', onSubmit);
-                    inputField.addEventListener('keypress', onKeyPress);
-                });
-            },
-            output: function(text) {
-                currentOutput += text;
-            },
-            read: function(filename) {
-                return Sk.builtinFiles.files[filename];
-            },
-            __future__: Sk.python3
+    // 模拟 input：弹窗获取用户输入
+    function showInputDialog(promptText) {
+        return new Promise((resolve, reject) => {
+            const dialog = document.getElementById('inputDialog');
+            const promptEl = document.getElementById('inputPrompt');
+            const inputField = document.getElementById('dialogInputValue');
+            const confirmBtn = document.getElementById('dialogConfirmBtn');
+            const cancelBtn = document.getElementById('dialogCancelBtn');
+            
+            promptEl.innerText = promptText;
+            inputField.value = '';
+            dialog.classList.add('active');
+            inputField.focus();
+            
+            const onConfirm = () => {
+                const val = inputField.value;
+                dialog.classList.remove('active');
+                cleanup();
+                resolve(val);
+            };
+            const onCancel = () => {
+                dialog.classList.remove('active');
+                cleanup();
+                reject(new Error('用户取消了输入'));
+            };
+            const onKeyPress = (e) => {
+                if (e.key === 'Enter') onConfirm();
+            };
+            const cleanup = () => {
+                confirmBtn.removeEventListener('click', onConfirm);
+                cancelBtn.removeEventListener('click', onCancel);
+                inputField.removeEventListener('keypress', onKeyPress);
+            };
+            confirmBtn.addEventListener('click', onConfirm);
+            cancelBtn.addEventListener('click', onCancel);
+            inputField.addEventListener('keypress', onKeyPress);
         });
     }
 
-    async function runPythonCode(code) {
+    // 解析代码中的 input() 调用，逐个询问并替换
+    async function replaceInputCalls(code) {
+        // 正则匹配 input(...) 调用，支持字符串参数
+        const inputRegex = /input\(([^)]*)\)/g;
+        const matches = [...code.matchAll(inputRegex)];
+        let newCode = code;
+        for (let i = 0; i < matches.length; i++) {
+            const match = matches[i];
+            const fullMatch = match[0];
+            const arg = match[1] ? match[1].replace(/^["']|["']$/g, '') : '';
+            const promptText = arg || '请输入';
+            let userInput;
+            try {
+                userInput = await showInputDialog(promptText);
+            } catch (e) {
+                throw new Error('输入被取消');
+            }
+            // 将 input(...) 替换为字符串或数字字面量
+            let replacement;
+            // 尝试判断是否为数字
+            if (/^-?\d+(\.\d+)?$/.test(userInput)) {
+                replacement = userInput;
+            } else {
+                replacement = `"${userInput.replace(/"/g, '\\"')}"`;
+            }
+            newCode = newCode.replace(fullMatch, replacement);
+        }
+        return newCode;
+    }
+
+    async function runPythonCode(originalCode) {
         await loadSkulpt();
+        // 先处理 input 调用
+        let processedCode;
+        try {
+            processedCode = await replaceInputCalls(originalCode);
+        } catch (e) {
+            throw new Error(e.message);
+        }
         return new Promise((resolve, reject) => {
             currentOutput = '';
-            setupSkulptInput();
-            
+            Sk.configure({
+                output: function(text) {
+                    currentOutput += text;
+                },
+                read: function(filename) {
+                    return Sk.builtinFiles.files[filename];
+                },
+                __future__: Sk.python3
+            });
             Sk.misceval.asyncToPromise(function() {
-                return Sk.importMainWithBody('<stdin>', false, code, false);
+                return Sk.importMainWithBody('<stdin>', false, processedCode, false);
             }).then(() => {
                 resolve({ output: currentOutput || '✅ 代码执行成功（无输出）', error: null });
             }).catch((err) => {
@@ -1157,7 +1217,6 @@ print(f"你好, {name}!")`;
         });
     }
 
-    // 运行代码按钮
     document.getElementById('runCodeBtn').onclick = async () => {
         const code = editor.getValue();
         const resultDiv = runResultDiv;
@@ -1183,7 +1242,7 @@ print(f"你好, {name}!")`;
         setTimeout(() => btn.innerHTML = orig, 2000);
     };
 
-    // ========== 可拖拽小人儿 + 智能弹窗 ==========
+    // ========== 智能问答助手拖拽逻辑 ==========
     const mascot = document.getElementById('floatingMascot');
     const chatWindow = document.getElementById('floatingChat');
     const tipBubbleEl = document.getElementById('tipBubble');
