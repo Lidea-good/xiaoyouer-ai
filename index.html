@@ -160,25 +160,11 @@
             min-height: 0;
         }
 
-        .left-gutter {
-            grid-column: 1;
-        }
-
-        .card-1 {
-            grid-column: 2;
-        }
-
-        .card-2 {
-            grid-column: 3;
-        }
-
-        .card-3 {
-            grid-column: 4;
-        }
-
-        .right-gutter {
-            grid-column: 5;
-        }
+        .left-gutter { grid-column: 1; }
+        .card-1 { grid-column: 2; }
+        .card-2 { grid-column: 3; }
+        .card-3 { grid-column: 4; }
+        .right-gutter { grid-column: 5; }
 
         .card {
             background: #ffffff;
@@ -216,9 +202,7 @@
             gap: 8px;
         }
 
-        .card-header .icon {
-            font-size: 1.1rem;
-        }
+        .card-header .icon { font-size: 1.1rem; }
 
         .theme-switch {
             display: flex;
@@ -237,14 +221,12 @@
             font-weight: 500;
             width: auto;
             margin: 0;
-            box-shadow: none;
             cursor: pointer;
         }
 
         .theme-btn.active {
             background: #ffffff;
             color: #2c4c6e;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .card-body {
@@ -255,7 +237,6 @@
             overflow: auto;
         }
 
-        /* CodeMirror 编辑器容器 */
         .editor-container {
             border-radius: 16px;
             overflow: hidden;
@@ -264,13 +245,8 @@
 
         .CodeMirror {
             height: 280px;
-            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
             font-size: 13px;
-        }
-
-        /* 深色主题时的边框 */
-        body.dark-editor .editor-container {
-            border-color: #1e2a3a;
         }
 
         textarea, input {
@@ -279,17 +255,15 @@
             background: #f8fafd;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
-            font-family: 'Inter', 'SF Mono', monospace;
+            font-family: 'Inter', monospace;
             font-size: 0.85rem;
             color: #1e2f3f;
             resize: vertical;
-            transition: all 0.2s ease;
         }
 
         textarea:focus, input:focus {
             outline: none;
             border-color: #8ba3bc;
-            box-shadow: 0 0 0 3px rgba(44, 76, 110, 0.05);
             background: #ffffff;
         }
 
@@ -307,7 +281,6 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            font-family: inherit;
         }
 
         button:hover {
@@ -318,26 +291,23 @@
         button.primary {
             background: #2c4c6e;
             color: white;
-            box-shadow: 0 2px 6px rgba(44, 76, 110, 0.15);
         }
 
         button.primary:hover {
             background: #1e3a55;
-            transform: translateY(-1px);
         }
 
         .output-box {
             background: #0f1724;
             border-radius: 16px;
             padding: 14px;
-            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            font-family: monospace;
             font-size: 0.75rem;
             line-height: 1.5;
             white-space: pre-wrap;
-            word-break: break-word;
             margin-top: 14px;
             min-height: 140px;
-            max-height: 220px;
+            max-height: 200px;
             overflow-y: auto;
             color: #e2e8f0;
             border: 1px solid #1e2a3a;
@@ -352,16 +322,14 @@
         .result-area {
             border-radius: 16px;
             padding: 14px;
-            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            font-family: monospace;
             font-size: 0.75rem;
             line-height: 1.45;
             white-space: pre-wrap;
-            word-break: break-word;
             margin-top: 14px;
             min-height: 100px;
             max-height: 140px;
             overflow-y: auto;
-            transition: all 0.2s ease;
             background: #0f1724;
             color: #e2e8f0;
             border: 1px solid #1e2a3a;
@@ -378,21 +346,51 @@
             border-color: #f85149;
         }
 
+        /* 输入交互区域 */
+        .input-interaction {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f0f4fa;
+            border-radius: 16px;
+            display: none;
+        }
+
+        .input-interaction.active {
+            display: block;
+        }
+
+        .input-interaction label {
+            font-size: 0.75rem;
+            color: #4a627a;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-interaction .input-field {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-interaction input {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .input-interaction button {
+            width: auto;
+            padding: 8px 20px;
+            margin: 0;
+        }
+
         .button-group {
             display: flex;
             gap: 10px;
             margin-top: 14px;
         }
 
-        .button-group button {
-            flex: 1;
-            margin-top: 0;
-        }
-
-        .run-btn {
-            background: #2c4c6e;
-            color: white;
-        }
+        .button-group button { flex: 1; margin-top: 0; }
+        .run-btn { background: #2c4c6e; color: white; }
 
         .tabs {
             display: flex;
@@ -416,16 +414,10 @@
         .tab-btn.active {
             background: #ffffff;
             color: #2c4c6e;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
         }
 
-        .tab-pane {
-            display: none;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
 
         .footer {
             background: rgba(255, 255, 255, 0.5);
@@ -433,7 +425,6 @@
             border-radius: 20px;
             padding: 12px 24px;
             margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
             flex-shrink: 0;
         }
 
@@ -454,53 +445,28 @@
             color: #8ba3bc;
         }
 
-        .footer-info span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .footer-info span { display: flex; align-items: center; gap: 5px; }
+        .footer-links { display: flex; gap: 16px; }
+        .footer-links a { color: #8ba3bc; text-decoration: none; font-size: 0.7rem; }
+        .footer-links a:hover { color: #2c4c6e; }
 
-        .footer-links {
-            display: flex;
-            gap: 16px;
-        }
-
-        .footer-links a {
-            color: #8ba3bc;
-            text-decoration: none;
-            font-size: 0.7rem;
-        }
-
-        .footer-links a:hover {
-            color: #2c4c6e;
-        }
-
-        /* 可拖拽小人儿 */
         .floating-mascot {
             position: fixed;
             z-index: 10000;
             cursor: grab;
-            user-select: none;
             width: 70px;
             height: 70px;
             left: 30px;
             bottom: 30px;
         }
-
-        .floating-mascot:active {
-            cursor: grabbing;
-        }
-
+        .floating-mascot:active { cursor: grabbing; }
         .floating-mascot .mascot {
             width: 100%;
             height: 100%;
             transition: transform 0.2s ease;
             filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
         }
-
-        .floating-mascot:hover .mascot {
-            transform: scale(1.05);
-        }
+        .floating-mascot:hover .mascot { transform: scale(1.05); }
 
         .floating-chat-window {
             position: fixed;
@@ -519,24 +485,15 @@
             flex-direction: column;
             border: 1px solid #eef2f8;
         }
-
-        .floating-chat-window.active {
-            display: flex;
-        }
-
+        .floating-chat-window.active { display: flex; }
         .floating-chat-window .chat-header {
             padding: 12px 16px;
             background: #fafcff;
             border-bottom: 1px solid #eef2f8;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 0.85rem;
             cursor: move;
-            flex-shrink: 0;
         }
-
         .floating-chat-window .chat-messages-area {
             flex: 1;
             overflow-y: auto;
@@ -546,66 +503,31 @@
             gap: 10px;
             background: #fefefe;
         }
-
-        .floating-chat-window .chat-message {
-            display: flex;
-        }
-
-        .floating-chat-window .chat-message.user {
-            justify-content: flex-end;
-        }
-
-        .floating-chat-window .chat-bubble {
+        .chat-message { display: flex; }
+        .chat-message.user { justify-content: flex-end; }
+        .chat-bubble {
             max-width: 80%;
             padding: 8px 14px;
             border-radius: 20px;
             font-size: 0.8rem;
         }
-
-        .floating-chat-window .chat-message.ai .chat-bubble {
-            background: #f0f4fa;
-            color: #1e2f3f;
-        }
-
-        .floating-chat-window .chat-message.user .chat-bubble {
-            background: #2c4c6e;
-            color: white;
-        }
-
-        .floating-chat-window .chat-input-area {
+        .chat-message.ai .chat-bubble { background: #f0f4fa; color: #1e2f3f; }
+        .chat-message.user .chat-bubble { background: #2c4c6e; color: white; }
+        .chat-input-area {
             display: flex;
             padding: 12px;
             border-top: 1px solid #eef2f8;
             gap: 8px;
-            background: white;
-            flex-shrink: 0;
         }
-
-        .floating-chat-window .chat-input-area input {
-            flex: 1;
-            padding: 8px 12px;
-            font-size: 0.8rem;
-            border-radius: 40px;
-        }
-
-        .floating-chat-window .chat-input-area button {
+        .chat-input-area input { flex: 1; padding: 8px 12px; border-radius: 40px; }
+        .chat-input-area button {
             width: auto;
             padding: 6px 16px;
             margin: 0;
             background: #2c4c6e;
             color: white;
         }
-
-        .chat-close {
-            cursor: pointer;
-            opacity: 0.5;
-            font-size: 18px;
-        }
-
-        .chat-close:hover {
-            opacity: 1;
-        }
-
+        .chat-close { cursor: pointer; opacity: 0.5; font-size: 18px; }
         .resize-handle {
             position: absolute;
             bottom: 0;
@@ -616,7 +538,6 @@
             background: linear-gradient(135deg, transparent 50%, #cbd5e1 50%);
             border-bottom-right-radius: 24px;
         }
-
         .tip-bubble {
             position: fixed;
             background: white;
@@ -632,8 +553,6 @@
             transition: opacity 0.2s;
             border: 1px solid #eef2f8;
         }
-
-        /* 字体大小提示 */
         .font-size-tip {
             position: fixed;
             bottom: 100px;
@@ -647,23 +566,11 @@
             z-index: 10002;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s;
         }
-
         @media (max-width: 1100px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .left-gutter, .right-gutter {
-                display: none;
-            }
-            .card-1, .card-2, .card-3 {
-                grid-column: 1;
-            }
-            body {
-                padding: 12px;
-            }
+            .dashboard { grid-template-columns: 1fr; gap: 16px; }
+            .left-gutter, .right-gutter { display: none; }
+            .card-1, .card-2, .card-3 { grid-column: 1; }
         }
     </style>
 </head>
@@ -694,12 +601,10 @@
     <div class="dashboard">
         <div class="left-gutter"></div>
 
+        <!-- 模块1：需求输入 -->
         <div class="card card-1">
             <div class="card-header">
-                <div class="card-header-left">
-                    <span class="icon">📝</span>
-                    <span>① 功能需求描述</span>
-                </div>
+                <div class="card-header-left"><span class="icon">📝</span><span>① 功能需求描述</span></div>
             </div>
             <div class="card-body">
                 <textarea id="requirementInput" rows="4" placeholder="例如：写一个Python函数，输入一个整数列表，返回最大值和最小值"></textarea>
@@ -708,12 +613,10 @@
             </div>
         </div>
 
+        <!-- 模块2：代码编写区 -->
         <div class="card card-2">
             <div class="card-header">
-                <div class="card-header-left">
-                    <span class="icon">💻</span>
-                    <span>② 代码编写区</span>
-                </div>
+                <div class="card-header-left"><span class="icon">💻</span><span>② 代码编写区</span></div>
                 <div class="theme-switch">
                     <button class="theme-btn active" data-theme="dark">🌙 深色</button>
                     <button class="theme-btn" data-theme="light">☀️ 浅色</button>
@@ -727,16 +630,22 @@
                     <button id="runCodeBtn" class="run-btn">▶ 运行代码</button>
                     <button id="copyCodeBtn">📋 复制代码</button>
                 </div>
+                <!-- 输入交互区域（用于 input() 函数） -->
+                <div id="inputInteraction" class="input-interaction">
+                    <label>📥 程序需要输入：</label>
+                    <div class="input-field">
+                        <input type="text" id="programInput" placeholder="请输入值...">
+                        <button id="submitInputBtn">提交</button>
+                    </div>
+                </div>
                 <div id="runResult" class="result-area">// 运行结果将显示在这里</div>
             </div>
         </div>
 
+        <!-- 模块3：调试工具箱 -->
         <div class="card card-3">
             <div class="card-header">
-                <div class="card-header-left">
-                    <span class="icon">🛠️</span>
-                    <span>③ 调试工具箱</span>
-                </div>
+                <div class="card-header-left"><span class="icon">🛠️</span><span>③ 调试工具箱</span></div>
             </div>
             <div class="card-body">
                 <div class="tabs">
@@ -775,7 +684,7 @@
 </div>
 
 <!-- 浮动小人儿 -->
-<div id="floatingMascot" class="floating-mascot" style="left: 30px; bottom: 30px; right: auto;">
+<div id="floatingMascot" class="floating-mascot" style="left: 30px; bottom: 30px;">
     <div class="mascot">
         <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="55" r="28" fill="#2c4c6e" stroke="#ffffff" stroke-width="2"/>
@@ -794,7 +703,6 @@
     </div>
 </div>
 
-<!-- 聊天窗 -->
 <div id="floatingChat" class="floating-chat-window">
     <div class="chat-header" id="chatHeader">
         <span>🐳 小油儿智能问答</span>
@@ -817,21 +725,13 @@
 
 <script>
     // ========== API 配置 ==========
-    const API_KEY = 'sk-253cf711aa244ab785c2d6847c0ab0d7';
+    const API_KEY = 'sk-你的真实API密钥';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-    // ========== 初始化 CodeMirror 编辑器 ==========
+    // ========== 初始化 CodeMirror ==========
     const editorTextarea = document.getElementById('codeEditor');
-    const defaultCode = `def find_max(numbers):
-    if not numbers:
-        return None
-    max_value = numbers[0]
-    for num in numbers:
-        if num > max_value:
-            max_value = num
-    return max_value
-
-print(find_max([3, 7, 2, 9, 5]))`;
+    const defaultCode = `name = input("请输入您的名字: ")
+print(f"你好, {name}！")`;
 
     const editor = CodeMirror.fromTextArea(editorTextarea, {
         mode: 'python',
@@ -840,36 +740,24 @@ print(find_max([3, 7, 2, 9, 5]))`;
         lineWrapping: true,
         indentUnit: 4,
         tabSize: 4,
-        indentWithTabs: false,
-        autofocus: true,
-        viewportMargin: Infinity
+        autofocus: true
     });
-
     editor.setValue(defaultCode);
 
-    // 字体大小控制
+    // ========== 字体缩放 ==========
     let currentFontSize = 13;
     const fontSizeTip = document.getElementById('fontSizeTip');
     let tipTimeout;
-
     function showFontTip() {
         fontSizeTip.style.opacity = '1';
         fontSizeTip.innerText = `字体大小: ${currentFontSize}px`;
         if (tipTimeout) clearTimeout(tipTimeout);
-        tipTimeout = setTimeout(() => {
-            fontSizeTip.style.opacity = '0';
-        }, 1500);
+        tipTimeout = setTimeout(() => fontSizeTip.style.opacity = '0', 1500);
     }
-
-    // Ctrl + 滚轮缩放字体
     editor.getWrapperElement().addEventListener('wheel', (e) => {
         if (e.ctrlKey) {
             e.preventDefault();
-            if (e.deltaY < 0) {
-                currentFontSize = Math.min(24, currentFontSize + 1);
-            } else {
-                currentFontSize = Math.max(10, currentFontSize - 1);
-            }
+            currentFontSize = Math.min(24, Math.max(10, currentFontSize + (e.deltaY < 0 ? 1 : -1)));
             editor.getWrapperElement().style.fontSize = currentFontSize + 'px';
             showFontTip();
         }
@@ -877,41 +765,24 @@ print(find_max([3, 7, 2, 9, 5]))`;
 
     // ========== 主题切换 ==========
     const themeBtns = document.querySelectorAll('.theme-btn');
-    const pseudoOutput = document.getElementById('pseudoOutput');
-    const errorExplanation = document.getElementById('errorExplanation');
-    const testOutput = document.getElementById('testOutput');
-    const runResult = document.getElementById('runResult');
-
+    const outputBoxes = [document.getElementById('pseudoOutput'), document.getElementById('errorExplanation'), document.getElementById('testOutput')];
+    const runResultDiv = document.getElementById('runResult');
     function setTheme(theme) {
         themeBtns.forEach(btn => {
-            if (btn.getAttribute('data-theme') === theme) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            if (btn.getAttribute('data-theme') === theme) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
-        
-        if (theme === 'light') {
-            editor.setOption('theme', 'eclipse');
-            pseudoOutput.classList.add('light-theme');
-            errorExplanation.classList.add('light-theme');
-            testOutput.classList.add('light-theme');
-            runResult.classList.add('light-theme');
-            document.body.classList.remove('dark-editor');
-        } else {
-            editor.setOption('theme', 'dracula');
-            pseudoOutput.classList.remove('light-theme');
-            errorExplanation.classList.remove('light-theme');
-            testOutput.classList.remove('light-theme');
-            runResult.classList.remove('light-theme');
-            document.body.classList.add('dark-editor');
-        }
+        editor.setOption('theme', theme === 'light' ? 'eclipse' : 'dracula');
+        outputBoxes.forEach(box => {
+            if (theme === 'light') box.classList.add('light-theme');
+            else box.classList.remove('light-theme');
+        });
+        if (theme === 'light') runResultDiv.classList.add('light-theme');
+        else runResultDiv.classList.remove('light-theme');
         localStorage.setItem('editorTheme', theme);
     }
-
     const savedTheme = localStorage.getItem('editorTheme') || 'dark';
     setTheme(savedTheme);
-
     themeBtns.forEach(btn => {
         btn.addEventListener('click', () => setTheme(btn.getAttribute('data-theme')));
     });
@@ -919,7 +790,6 @@ print(find_max([3, 7, 2, 9, 5]))`;
     // ========== API 状态检测 ==========
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
-
     async function checkAPIConnection() {
         try {
             const response = await fetch(API_URL, {
@@ -930,9 +800,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
             if (response.ok) {
                 statusDot.className = 'status-dot connected';
                 statusText.textContent = 'DeepSeek API 已连接';
-            } else {
-                throw new Error();
-            }
+            } else throw new Error();
         } catch (e) {
             statusDot.className = 'status-dot disconnected';
             statusText.textContent = 'DeepSeek API 断开';
@@ -966,7 +834,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
         return data.choices[0].message.content;
     }
 
-    // ========== 伪代码生成 ==========
+    // 伪代码生成
     document.getElementById('genPseudoBtn').onclick = async () => {
         const req = document.getElementById('requirementInput').value.trim();
         if (!req) { document.getElementById('pseudoOutput').innerText = '⚠️ 请输入需求'; return; }
@@ -976,7 +844,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
         catch(e) { out.innerText = '❌ ' + e.message; }
     };
 
-    // ========== 报错解释 ==========
+    // 报错解释
     document.getElementById('explainErrorBtn').onclick = async () => {
         const err = document.getElementById('errorInput').value.trim();
         if (!err) { document.getElementById('errorExplanation').innerText = '⚠️ 请粘贴报错'; return; }
@@ -986,7 +854,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
         catch(e) { out.innerText = '❌ ' + e.message; }
     };
 
-    // ========== 测试用例生成 ==========
+    // 测试用例生成
     document.getElementById('genTestCaseBtn').onclick = async () => {
         const code = document.getElementById('functionCodeInput').value.trim();
         if (!code) { document.getElementById('testOutput').innerText = '⚠️ 请粘贴代码'; return; }
@@ -996,38 +864,80 @@ print(find_max([3, 7, 2, 9, 5]))`;
         catch(e) { out.innerText = '❌ ' + e.message; }
     };
 
-    // ========== Python 代码执行 ==========
-    function loadSkulpt() {
-        return new Promise((resolve) => {
-            if (window.Sk) { resolve(); return; }
-            const s1 = document.createElement('script');
-            s1.src = 'https://skulpt.org/js/skulpt.min.js';
-            s1.onload = () => {
-                const s2 = document.createElement('script');
-                s2.src = 'https://skulpt.org/js/skulpt-stdlib.js';
-                s2.onload = () => resolve();
-                document.head.appendChild(s2);
-            };
-            document.head.appendChild(s1);
+    // ========== 支持 input() 的 Python 执行器 ==========
+    let pendingInputResolver = null;
+    let currentCode = '';
+    let currentOutput = '';
+    let currentError = null;
+
+    function setupInputHandler() {
+        Sk.configure({
+            inputfun: function(promptText) {
+                return new Promise((resolve) => {
+                    pendingInputResolver = resolve;
+                    const inputDiv = document.getElementById('inputInteraction');
+                    const inputField = document.getElementById('programInput');
+                    const submitBtn = document.getElementById('submitInputBtn');
+                    
+                    inputDiv.classList.add('active');
+                    inputField.value = '';
+                    inputField.placeholder = promptText || '请输入值...';
+                    inputField.focus();
+                    
+                    const onSubmit = () => {
+                        const value = inputField.value;
+                        inputDiv.classList.remove('active');
+                        pendingInputResolver = null;
+                        resolve(value);
+                        submitBtn.removeEventListener('click', onSubmit);
+                        inputField.removeEventListener('keypress', onKeyPress);
+                    };
+                    const onKeyPress = (e) => { if (e.key === 'Enter') onSubmit(); };
+                    submitBtn.addEventListener('click', onSubmit);
+                    inputField.addEventListener('keypress', onKeyPress);
+                });
+            },
+            output: function(text) {
+                currentOutput += text;
+            },
+            read: function(filename) {
+                return Sk.builtinFiles.files[filename];
+            },
+            __future__: Sk.python3
+        });
+    }
+
+    async function runPythonCode(code) {
+        return new Promise((resolve, reject) => {
+            currentOutput = '';
+            currentError = null;
+            setupInputHandler();
+            
+            Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody('<stdin>', false, code, false);
+            }).then(() => {
+                resolve({ output: currentOutput || '✅ 执行成功（无输出）', error: null });
+            }).catch((err) => {
+                let errStr = err.toString();
+                errStr = errStr.replace('Traceback (most recent call last):\n  File "<stdin>", line ', '第 ');
+                errStr = errStr.replace(', in <module>', ' 行');
+                reject(new Error(errStr));
+            });
         });
     }
 
     document.getElementById('runCodeBtn').onclick = async () => {
         const code = editor.getValue();
-        const resultDiv = runResult;
+        const resultDiv = runResultDiv;
         const isLight = resultDiv.classList.contains('light-theme');
         resultDiv.innerHTML = '⏳ 运行中...';
         resultDiv.classList.remove('error');
         try {
-            await loadSkulpt();
-            let output = '';
-            Sk.configure({ output: (t) => { output += t; }, read: (f) => Sk.builtinFiles.files[f], __future__: Sk.python3 });
-            await Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, code, false));
-            resultDiv.innerHTML = output || '✅ 执行成功';
+            const result = await runPythonCode(code);
+            resultDiv.innerHTML = result.output;
             if (isLight) resultDiv.classList.add('light-theme');
         } catch(err) {
-            let msg = err.toString().replace('Traceback (most recent call last):\n  File "<stdin>", line ', '第 ').replace(', in <module>', ' 行');
-            resultDiv.innerHTML = '❌ ' + msg;
+            resultDiv.innerHTML = '❌ ' + err.message;
             resultDiv.classList.add('error');
             if (isLight) resultDiv.classList.add('light-theme');
         }
@@ -1041,7 +951,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
         setTimeout(() => btn.innerHTML = orig, 2000);
     };
 
-    // ========== 可拖拽小人儿 + 智能弹窗 ==========
+    // ========== 智能问答助手拖拽逻辑 ==========
     const mascot = document.getElementById('floatingMascot');
     const chatWindow = document.getElementById('floatingChat');
     const tipBubbleEl = document.getElementById('tipBubble');
@@ -1052,9 +962,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
     const sendChatMsg = document.getElementById('sendChatMsg');
     const chatMessagesArea = document.getElementById('chatMessagesArea');
 
-    let isDragging = false;
-    let isResizing = false;
-    let isDraggingChat = false;
+    let isDragging = false, isResizing = false, isDraggingChat = false;
     let dragStartX, dragStartY, startLeft, startTop;
     let resizeStartX, resizeStartY, startWidth, startHeight;
     let chatDragStartX, chatDragStartY, chatStartLeft, chatStartTop;
@@ -1069,17 +977,13 @@ print(find_max([3, 7, 2, 9, 5]))`;
         tipBubbleEl.style.left = left + 'px';
         tipBubbleEl.style.top = top + 'px';
         if (showTipTimeout) clearTimeout(showTipTimeout);
-        showTipTimeout = setTimeout(() => {
-            tipBubbleEl.style.opacity = '0';
-        }, 2500);
+        showTipTimeout = setTimeout(() => tipBubbleEl.style.opacity = '0', 2500);
     }
-
     mascot.addEventListener('mouseenter', () => {
         if (!isDragging && !chatWindow.classList.contains('active')) showTip();
     });
 
     mascot.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.chat-close')) return;
         isDragging = true;
         const rect = mascot.getBoundingClientRect();
         startLeft = rect.left;
@@ -1097,12 +1001,8 @@ print(find_max([3, 7, 2, 9, 5]))`;
         const chatHeight = chatWindow.offsetHeight;
         let left, top;
         const isOnRight = mascotRect.left + mascotRect.width / 2 > window.innerWidth / 2;
-        
-        if (isOnRight) {
-            left = mascotRect.left - chatWidth - 15;
-        } else {
-            left = mascotRect.right + 15;
-        }
+        if (isOnRight) left = mascotRect.left - chatWidth - 15;
+        else left = mascotRect.right + 15;
         top = mascotRect.top + mascotRect.height / 2 - chatHeight / 2;
         top = Math.max(10, Math.min(window.innerHeight - chatHeight - 10, top));
         left = Math.max(10, Math.min(window.innerWidth - chatWidth - 10, left));
@@ -1118,11 +1018,7 @@ print(find_max([3, 7, 2, 9, 5]))`;
             top = Math.max(10, Math.min(window.innerHeight - 80, top));
             mascot.style.left = left + 'px';
             mascot.style.top = top + 'px';
-            mascot.style.bottom = 'auto';
-            mascot.style.right = 'auto';
-            if (chatWindow.classList.contains('active')) {
-                updateChatWindowPosition();
-            }
+            if (chatWindow.classList.contains('active')) updateChatWindowPosition();
         } else if (isResizing) {
             let newWidth = startWidth + (e.clientX - resizeStartX);
             let newHeight = startHeight + (e.clientY - resizeStartY);
@@ -1170,20 +1066,17 @@ print(find_max([3, 7, 2, 9, 5]))`;
         e.stopPropagation();
     });
 
-    mascot.addEventListener('click', (e) => {
+    mascot.addEventListener('click', () => {
         if (isDragging) return;
-        if (chatWindow.classList.contains('active')) {
-            chatWindow.classList.remove('active');
-        } else {
+        if (chatWindow.classList.contains('active')) chatWindow.classList.remove('active');
+        else {
             updateChatWindowPosition();
             chatWindow.classList.add('active');
             tipBubbleEl.style.opacity = '0';
         }
     });
 
-    closeChatBtn.addEventListener('click', () => {
-        chatWindow.classList.remove('active');
-    });
+    closeChatBtn.addEventListener('click', () => chatWindow.classList.remove('active'));
 
     async function sendChat() {
         const q = chatInputMsg.value.trim();
@@ -1194,22 +1087,15 @@ print(find_max([3, 7, 2, 9, 5]))`;
         aiDiv.className = 'chat-message ai';
         aiDiv.innerHTML = '<div class="chat-bubble">🐳 思考中...</div>';
         chatMessagesArea.appendChild(aiDiv);
-        chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
         try {
             const r = await callDeepSeek("你是小油儿，Python学习助手。亲切回答。", q);
             aiDiv.innerHTML = `<div class="chat-bubble">${escapeHtml(r)}</div>`;
-        } catch(e) {
-            aiDiv.innerHTML = `<div class="chat-bubble">⚠️ ${escapeHtml(e.message)}</div>`;
-        }
+        } catch(e) { aiDiv.innerHTML = `<div class="chat-bubble">⚠️ ${escapeHtml(e.message)}</div>`; }
         chatMessagesArea.scrollTop = chatMessagesArea.scrollHeight;
     }
-
     sendChatMsg.onclick = sendChat;
     chatInputMsg.onkeypress = (e) => { if (e.key === 'Enter') sendChat(); };
-
-    function escapeHtml(s) {
-        return s.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-    }
+    function escapeHtml(s) { return s.replace(/[&<>]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
     // Tab 切换
     document.querySelectorAll('.tab-btn').forEach(btn => {
