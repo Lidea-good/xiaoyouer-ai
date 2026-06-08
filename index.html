@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>🐳 小油儿AI编程助手 · Python版</title>
     
+    <!-- CodeMirror 代码编辑器 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+    
+    <!-- CodeMirror 核心 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <!-- CodeMirror Python 模式 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -245,6 +255,24 @@
             overflow: auto;
         }
 
+        /* CodeMirror 编辑器容器 */
+        .editor-container {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #d4dce6;
+        }
+
+        .CodeMirror {
+            height: 280px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+            font-size: 13px;
+        }
+
+        /* 深色主题时的边框 */
+        body.dark-editor .editor-container {
+            border-color: #1e2a3a;
+        }
+
         textarea, input {
             width: 100%;
             padding: 12px 16px;
@@ -315,28 +343,8 @@
             border: 1px solid #1e2a3a;
         }
 
-        .code-editor {
-            width: 100%;
-            font-family: 'JetBrains Mono', 'SF Mono', monospace;
-            font-size: 0.8rem;
-            line-height: 1.45;
-            resize: vertical;
-            min-height: 250px;
-            border-radius: 14px;
-            padding: 14px;
-            transition: all 0.2s ease;
-            background: #0f1724;
-            color: #e2e8f0;
-            border: 1px solid #1e2a3a;
-        }
-
-        .code-editor:focus {
-            outline: none;
-            border-color: #58a6ff;
-        }
-
-        .code-editor.light-theme {
-            background: #fefcf5;
+        .output-box.light-theme {
+            background: #f8fafd;
             color: #1e2f3f;
             border: 1px solid #d4dce6;
         }
@@ -467,7 +475,7 @@
             color: #2c4c6e;
         }
 
-        /* 可拖拽小人儿 - 默认放在左侧 */
+        /* 可拖拽小人儿 */
         .floating-mascot {
             position: fixed;
             z-index: 10000;
@@ -494,7 +502,6 @@
             transform: scale(1.05);
         }
 
-        /* 可缩放聊天窗 */
         .floating-chat-window {
             position: fixed;
             z-index: 10001;
@@ -626,6 +633,23 @@
             border: 1px solid #eef2f8;
         }
 
+        /* 字体大小提示 */
+        .font-size-tip {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            z-index: 10002;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
         @media (max-width: 1100px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -639,10 +663,6 @@
             }
             body {
                 padding: 12px;
-            }
-            .floating-mascot {
-                left: 30px;
-                bottom: 30px;
             }
         }
     </style>
@@ -700,17 +720,9 @@
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="codeEditor" class="code-editor" rows="12" placeholder='# 根据左侧伪代码编写你的Python代码
-def find_max(numbers):
-    if not numbers:
-        return None
-    max_value = numbers[0]
-    for num in numbers:
-        if num > max_value:
-            max_value = num
-    return max_value
-
-print(find_max([3, 7, 2, 9, 5]))'></textarea>
+                <div class="editor-container">
+                    <textarea id="codeEditor"></textarea>
+                </div>
                 <div class="button-group">
                     <button id="runCodeBtn" class="run-btn">▶ 运行代码</button>
                     <button id="copyCodeBtn">📋 复制代码</button>
@@ -762,7 +774,7 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
     </div>
 </div>
 
-<!-- 浮动小人儿 - 默认左侧 -->
+<!-- 浮动小人儿 -->
 <div id="floatingMascot" class="floating-mascot" style="left: 30px; bottom: 30px; right: auto;">
     <div class="mascot">
         <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -801,10 +813,108 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
 </div>
 
 <div id="tipBubble" class="tip-bubble">🐳 需要帮助吗？</div>
+<div id="fontSizeTip" class="font-size-tip">字体大小: 13px</div>
 
 <script>
-    const API_KEY = 'sk-6d7c0d28c90b4dc2bb32b814f3e2ed06';
+    // ========== API 配置 ==========
+    const API_KEY = 'sk-你的真实API密钥';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+    // ========== 初始化 CodeMirror 编辑器 ==========
+    const editorTextarea = document.getElementById('codeEditor');
+    const defaultCode = `def find_max(numbers):
+    if not numbers:
+        return None
+    max_value = numbers[0]
+    for num in numbers:
+        if num > max_value:
+            max_value = num
+    return max_value
+
+print(find_max([3, 7, 2, 9, 5]))`;
+
+    const editor = CodeMirror.fromTextArea(editorTextarea, {
+        mode: 'python',
+        theme: 'dracula',
+        lineNumbers: true,
+        lineWrapping: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        autofocus: true,
+        viewportMargin: Infinity
+    });
+
+    editor.setValue(defaultCode);
+
+    // 字体大小控制
+    let currentFontSize = 13;
+    const fontSizeTip = document.getElementById('fontSizeTip');
+    let tipTimeout;
+
+    function showFontTip() {
+        fontSizeTip.style.opacity = '1';
+        fontSizeTip.innerText = `字体大小: ${currentFontSize}px`;
+        if (tipTimeout) clearTimeout(tipTimeout);
+        tipTimeout = setTimeout(() => {
+            fontSizeTip.style.opacity = '0';
+        }, 1500);
+    }
+
+    // Ctrl + 滚轮缩放字体
+    editor.getWrapperElement().addEventListener('wheel', (e) => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                currentFontSize = Math.min(24, currentFontSize + 1);
+            } else {
+                currentFontSize = Math.max(10, currentFontSize - 1);
+            }
+            editor.getWrapperElement().style.fontSize = currentFontSize + 'px';
+            showFontTip();
+        }
+    });
+
+    // ========== 主题切换 ==========
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const pseudoOutput = document.getElementById('pseudoOutput');
+    const errorExplanation = document.getElementById('errorExplanation');
+    const testOutput = document.getElementById('testOutput');
+    const runResult = document.getElementById('runResult');
+
+    function setTheme(theme) {
+        themeBtns.forEach(btn => {
+            if (btn.getAttribute('data-theme') === theme) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        if (theme === 'light') {
+            editor.setOption('theme', 'eclipse');
+            pseudoOutput.classList.add('light-theme');
+            errorExplanation.classList.add('light-theme');
+            testOutput.classList.add('light-theme');
+            runResult.classList.add('light-theme');
+            document.body.classList.remove('dark-editor');
+        } else {
+            editor.setOption('theme', 'dracula');
+            pseudoOutput.classList.remove('light-theme');
+            errorExplanation.classList.remove('light-theme');
+            testOutput.classList.remove('light-theme');
+            runResult.classList.remove('light-theme');
+            document.body.classList.add('dark-editor');
+        }
+        localStorage.setItem('editorTheme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('editorTheme') || 'dark';
+    setTheme(savedTheme);
+
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.getAttribute('data-theme')));
+    });
 
     // ========== API 状态检测 ==========
     const statusDot = document.getElementById('statusDot');
@@ -839,31 +949,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
     else if (ua.includes('Linux')) os = 'Linux';
     else if (/Android|iPhone|iPad/i.test(ua)) os = '移动端';
     dynamicInfo.innerHTML = `🖥️ 当前系统：${os} | 🌐 网页版已就绪`;
-
-    // ========== 主题切换 ==========
-    const codeEditor = document.getElementById('codeEditor');
-    const runResult = document.getElementById('runResult');
-    const themeBtns = document.querySelectorAll('.theme-btn');
-
-    function setTheme(theme) {
-        themeBtns.forEach(btn => {
-            if (btn.getAttribute('data-theme') === theme) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        if (theme === 'light') {
-            codeEditor.classList.add('light-theme');
-            runResult.classList.add('light-theme');
-        } else {
-            codeEditor.classList.remove('light-theme');
-            runResult.classList.remove('light-theme');
-        }
-        localStorage.setItem('editorTheme', theme);
-    }
-    const savedTheme = localStorage.getItem('editorTheme') || 'dark';
-    setTheme(savedTheme);
-    themeBtns.forEach(btn => {
-        btn.addEventListener('click', () => setTheme(btn.getAttribute('data-theme')));
-    });
 
     // ========== API 调用 ==========
     async function callDeepSeek(systemPrompt, userMessage) {
@@ -928,7 +1013,7 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
     }
 
     document.getElementById('runCodeBtn').onclick = async () => {
-        const code = codeEditor.value;
+        const code = editor.getValue();
         const resultDiv = runResult;
         const isLight = resultDiv.classList.contains('light-theme');
         resultDiv.innerHTML = '⏳ 运行中...';
@@ -949,7 +1034,7 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
     };
 
     document.getElementById('copyCodeBtn').onclick = async () => {
-        await navigator.clipboard.writeText(codeEditor.value);
+        await navigator.clipboard.writeText(editor.getValue());
         const btn = document.getElementById('copyCodeBtn');
         const orig = btn.innerHTML;
         btn.innerHTML = '✅ 已复制';
@@ -975,7 +1060,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
     let chatDragStartX, chatDragStartY, chatStartLeft, chatStartTop;
     let showTipTimeout;
 
-    // 显示提示气泡
     function showTip() {
         tipBubbleEl.style.opacity = '1';
         const rect = mascot.getBoundingClientRect();
@@ -994,7 +1078,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         if (!isDragging && !chatWindow.classList.contains('active')) showTip();
     });
 
-    // 拖拽小人儿
     mascot.addEventListener('mousedown', (e) => {
         if (e.target.closest('.chat-close')) return;
         isDragging = true;
@@ -1008,36 +1091,25 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         tipBubbleEl.style.opacity = '0';
     });
 
-    // 根据小人儿位置更新聊天窗位置（方向跟随）
     function updateChatWindowPosition() {
         const mascotRect = mascot.getBoundingClientRect();
         const chatWidth = chatWindow.offsetWidth;
         const chatHeight = chatWindow.offsetHeight;
         let left, top;
-        
-        // 判断小人儿在屏幕左侧还是右侧
         const isOnRight = mascotRect.left + mascotRect.width / 2 > window.innerWidth / 2;
         
         if (isOnRight) {
-            // 小人儿在右侧，弹窗向左弹出
             left = mascotRect.left - chatWidth - 15;
         } else {
-            // 小人儿在左侧，弹窗向右弹出
             left = mascotRect.right + 15;
         }
-        
-        // 垂直方向居中对齐
         top = mascotRect.top + mascotRect.height / 2 - chatHeight / 2;
-        
-        // 边界限制
         top = Math.max(10, Math.min(window.innerHeight - chatHeight - 10, top));
         left = Math.max(10, Math.min(window.innerWidth - chatWidth - 10, left));
-        
         chatWindow.style.left = left + 'px';
         chatWindow.style.top = top + 'px';
     }
 
-    // 全局鼠标移动处理
     window.addEventListener('mousemove', (e) => {
         if (isDragging) {
             let left = startLeft + (e.clientX - dragStartX);
@@ -1048,8 +1120,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
             mascot.style.top = top + 'px';
             mascot.style.bottom = 'auto';
             mascot.style.right = 'auto';
-            
-            // 如果聊天窗是打开的，拖动小人儿时聊天窗跟着移动
             if (chatWindow.classList.contains('active')) {
                 updateChatWindowPosition();
             }
@@ -1078,7 +1148,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         chatWindow.style.cursor = '';
     });
 
-    // 拖拽聊天窗头部
     chatHeader.addEventListener('mousedown', (e) => {
         if (e.target.closest('.chat-close')) return;
         isDraggingChat = true;
@@ -1091,7 +1160,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         e.preventDefault();
     });
 
-    // 缩放聊天窗
     resizeHandle.addEventListener('mousedown', (e) => {
         isResizing = true;
         resizeStartX = e.clientX;
@@ -1102,7 +1170,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         e.stopPropagation();
     });
 
-    // 点击小人儿：切换聊天窗，并更新位置方向
     mascot.addEventListener('click', (e) => {
         if (isDragging) return;
         if (chatWindow.classList.contains('active')) {
@@ -1118,7 +1185,6 @@ print(find_max([3, 7, 2, 9, 5]))'></textarea>
         chatWindow.classList.remove('active');
     });
 
-    // 聊天发送
     async function sendChat() {
         const q = chatInputMsg.value.trim();
         if (!q) return;
